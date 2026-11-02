@@ -1,0 +1,6 @@
+{
+  "name": "ÉLÉGANCE — Luxury Bridal Makeup & Makeover Atelier",
+  "description": "An ultra-realistic, scroll-animated luxury bridal makeup studio showcasing haute couture bridal beauty, brush-wipe transformations, and editorial portfolio.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

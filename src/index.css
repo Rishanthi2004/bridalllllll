@@ -1,0 +1,58 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-serif: "Cormorant Garamond", Georgia, Cambria, "Times New Roman", Times, serif;
+  --font-sans: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --color-gold-300: #e8d08d;
+  --color-gold-400: #dfbe85;
+  --color-gold-500: #d4af37;
+  --color-gold-600: #b89324;
+  --color-nude-50: #faf6f0;
+  --color-nude-100: #f5ebe1;
+  --color-nude-200: #ecdcc9;
+  --color-noir: #0c0a09;
+}
+
+/* Custom scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0c0a09;
+}
+::-webkit-scrollbar-thumb {
+  background: #2a2421;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #d4af37;
+}
+
+/* Luxury gold text clip */
+.text-gold-gradient {
+  background: linear-gradient(135deg, #fff2db 0%, #dfbe85 50%, #b89324 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gold-subtle {
+  background: linear-gradient(135deg, #fcefe3 0%, #e0c8a8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Soft cosmetic dust particle float */
+@keyframes cosmetic-float {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-12px) rotate(3deg);
+  }
+}
+
+.animate-cosmetic-float {
+  animation: cosmetic-float 7s ease-in-out infinite;
+}
