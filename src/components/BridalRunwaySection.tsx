@@ -208,42 +208,42 @@ export const BridalRunwaySection: React.FC = () => {
   return (
     <section
       id="runway"
-      className="relative py-14 md:py-24 px-4 md:px-8 bg-gradient-to-b from-[#0c0a09] via-[#140e0b] to-[#0c0a09] overflow-hidden"
+      className="relative py-14 md:py-24 px-4 md:px-8 bg-gradient-to-b from-[#faf8f5] via-[#f5efe6] to-[#faf8f5] overflow-hidden"
     >
       {/* Dynamic Animated Ambient Glow */}
       <motion.div
-        animate={{ opacity: [0.15, 0.28, 0.15] }}
+        animate={{ opacity: [0.1, 0.2, 0.1] }}
         transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
-        className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[650px] h-[350px] bg-gradient-to-r from-[#dfbe85]/15 via-[#d4af37]/20 to-[#dfbe85]/15 blur-[120px] pointer-events-none rounded-full"
+        className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[650px] h-[350px] bg-gradient-to-r from-[#dfbe85]/15 via-[#c5a059]/15 to-[#dfbe85]/15 blur-[120px] pointer-events-none rounded-full"
       />
 
       <div className="max-w-7xl mx-auto relative z-10">
-        {/* Section Header (Compact & Punchy) */}
+        {/* Section Header */}
         <div className="text-center max-w-xl mx-auto mb-8">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#dfbe85]/10 border border-[#dfbe85]/30 mb-2 backdrop-blur-sm"
+            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#f5efe6] border border-[#c5a059]/40 mb-2 backdrop-blur-sm"
           >
-            <Sparkles className="w-3.5 h-3.5 text-[#dfbe85] animate-spin" style={{ animationDuration: '6s' }} />
-            <span className="text-[10px] uppercase tracking-[0.25em] text-[#dfbe85] font-sans font-medium">
+            <Sparkles className="w-3.5 h-3.5 text-[#c5a059] animate-spin" style={{ animationDuration: '6s' }} />
+            <span className="text-[10px] uppercase tracking-[0.25em] text-[#c5a059] font-sans font-medium">
               Live Spotlight Theater
             </span>
           </motion.div>
 
-          <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl text-[#faf8f5] tracking-tight">
+          <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl text-[#0f1b2b] tracking-tight">
             The Bridal Runway
           </h2>
-          <p className="mt-1.5 text-xs sm:text-sm text-white/60 font-sans">
+          <p className="mt-1.5 text-xs sm:text-sm text-[#4a5d73] font-sans">
             Tap the glowing points to uncover secret techniques and formulas.
           </p>
         </div>
 
         {/* Main Interactive Animated Stage */}
-        <div className="relative rounded-2xl bg-gradient-to-b from-[#1c1511] via-[#120e0b] to-[#0a0807] border border-[#dfbe85]/25 p-4 sm:p-6 shadow-2xl overflow-hidden">
+        <div className="relative rounded-2xl bg-[#ffffff] border border-[#ede4d8] p-4 sm:p-6 shadow-[0_15px_45px_rgba(15,27,43,0.06)] overflow-hidden">
           {/* Top Stage Control Bar */}
-          <div className="flex items-center justify-between gap-2 pb-4 mb-4 border-b border-[#dfbe85]/15">
+          <div className="flex items-center justify-between gap-2 pb-4 mb-4 border-b border-[#ede4d8]">
             {/* Slide Indicator Pills */}
             <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
               {runwayLooks.map((look, idx) => (
@@ -253,10 +253,10 @@ export const BridalRunwaySection: React.FC = () => {
                     setCurrentIndex(idx);
                     setActivePin(null);
                   }}
-                  className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-sans whitespace-nowrap transition-all duration-300 ${
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-sans whitespace-nowrap transition-all duration-300 ${
                     currentIndex === idx
-                      ? 'bg-gradient-to-r from-[#dfbe85] to-[#d4af37] text-[#0c0a09] font-medium shadow-[0_0_12px_rgba(212,175,55,0.4)]'
-                      : 'bg-white/[0.04] text-white/60 hover:text-white border border-white/5'
+                      ? 'bg-[#0f1b2b] text-[#faf8f5] font-semibold shadow-sm'
+                      : 'bg-[#f5efe6] text-[#1b2a41] hover:text-[#0f1b2b] border border-[#ede4d8]'
                   }`}
                 >
                   <span className="font-serif text-[11px]">{`0${idx + 1}`}</span>
@@ -269,21 +269,21 @@ export const BridalRunwaySection: React.FC = () => {
             <div className="flex items-center gap-1.5 shrink-0">
               <button
                 onClick={() => setIsPlaying(!isPlaying)}
-                className="p-1.5 rounded-full bg-white/[0.05] border border-[#dfbe85]/30 text-[#dfbe85] hover:bg-[#dfbe85]/20 transition-all"
+                className="p-1.5 rounded-full bg-[#f5efe6] border border-[#ede4d8] text-[#0f1b2b] hover:bg-[#ede4d8] transition-all"
                 title={isPlaying ? 'Pause' : 'Play'}
               >
                 {isPlaying ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3" />}
               </button>
               <button
                 onClick={handlePrev}
-                className="p-1.5 rounded-full bg-white/[0.05] border border-white/10 text-white/70 hover:text-white transition-all"
+                className="p-1.5 rounded-full bg-[#f5efe6] border border-[#ede4d8] text-[#1b2a41] hover:text-[#0f1b2b] transition-all"
                 aria-label="Previous"
               >
                 <ChevronLeft className="w-3.5 h-3.5" />
               </button>
               <button
                 onClick={handleNext}
-                className="p-1.5 rounded-full bg-white/[0.05] border border-white/10 text-white/70 hover:text-white transition-all"
+                className="p-1.5 rounded-full bg-[#f5efe6] border border-[#ede4d8] text-[#1b2a41] hover:text-[#0f1b2b] transition-all"
                 aria-label="Next"
               >
                 <ChevronRight className="w-3.5 h-3.5" />
@@ -295,7 +295,7 @@ export const BridalRunwaySection: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
             {/* Visual Column */}
             <div className="lg:col-span-7 relative">
-              <div className="relative aspect-[4/5] sm:aspect-[16/10] lg:aspect-[4/5] w-full rounded-xl overflow-hidden shadow-xl border border-[#dfbe85]/30 group">
+              <div className="relative aspect-[4/5] sm:aspect-[16/10] lg:aspect-[4/5] w-full rounded-xl overflow-hidden shadow-xl border border-[#ede4d8] group">
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={currentLook.id}
@@ -309,17 +309,17 @@ export const BridalRunwaySection: React.FC = () => {
                       src={currentLook.image}
                       alt={currentLook.title}
                       referrerPolicy="no-referrer"
-                      className="w-full h-full object-cover object-center filter brightness-[0.92] contrast-[1.08]"
+                      className="w-full h-full object-cover object-center filter brightness-[0.95] contrast-[1.05]"
                     />
 
                     {/* Studio Light Sweep */}
                     <motion.div
                       animate={{ x: ['-100%', '200%'] }}
                       transition={{ repeat: Infinity, duration: 6, ease: 'easeInOut', repeatDelay: 2 }}
-                      className="absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-white/15 to-transparent skew-x-12 pointer-events-none"
+                      className="absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12 pointer-events-none"
                     />
 
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#0c0a09] via-transparent to-black/20 pointer-events-none" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
                   </motion.div>
                 </AnimatePresence>
 
@@ -334,12 +334,12 @@ export const BridalRunwaySection: React.FC = () => {
                     >
                       <button
                         onClick={() => setActivePin(isActive ? null : i)}
-                        className="relative group/pin focus:outline-none -translate-x-1/2 -translate-y-1/2"
+                        className="relative group/pin focus:outline-none -translate-x-1/2 -translate-y-1/2 cursor-pointer"
                         aria-label={spot.title}
                       >
                         <span className="absolute -inset-1.5 rounded-full bg-[#dfbe85]/40 animate-ping opacity-75" />
-                        <span className="relative flex items-center justify-center w-6 h-6 rounded-full bg-gradient-to-r from-[#dfbe85] to-[#d4af37] text-[#0c0a09] shadow-[0_0_15px_rgba(212,175,55,0.7)] group-hover/pin:scale-125 transition-transform duration-300">
-                          <Sparkles className="w-3 h-3" />
+                        <span className="relative flex items-center justify-center w-6 h-6 rounded-full bg-[#0f1b2b] text-[#faf8f5] border border-[#c5a059] shadow-[0_2px_10px_rgba(0,0,0,0.4)] group-hover/pin:scale-125 transition-transform duration-300">
+                          <Sparkles className="w-3 h-3 text-[#c5a059]" />
                         </span>
                       </button>
 
@@ -350,10 +350,10 @@ export const BridalRunwaySection: React.FC = () => {
                             initial={{ opacity: 0, y: 8, scale: 0.92 }}
                             animate={{ opacity: 1, y: 0, scale: 1 }}
                             exit={{ opacity: 0, y: 8, scale: 0.92 }}
-                            className="absolute z-40 left-1/2 -translate-x-1/2 bottom-full mb-2 w-56 sm:w-64 p-3 rounded-xl bg-[#0c0a09]/95 backdrop-blur-xl border border-[#dfbe85]/50 shadow-2xl text-left"
+                            className="absolute z-40 left-1/2 -translate-x-1/2 bottom-full mb-2 w-56 sm:w-64 p-3 rounded-xl bg-[#ffffff] backdrop-blur-xl border border-[#ede4d8] shadow-2xl text-left"
                           >
-                            <div className="flex items-center justify-between pb-1 mb-1 border-b border-[#dfbe85]/20">
-                              <span className="text-[9px] uppercase tracking-widest text-[#dfbe85] font-sans">
+                            <div className="flex items-center justify-between pb-1 mb-1 border-b border-[#ede4d8]">
+                              <span className="text-[9px] uppercase tracking-widest text-[#c5a059] font-sans font-semibold">
                                 Secret Technique
                               </span>
                               <button
@@ -361,13 +361,13 @@ export const BridalRunwaySection: React.FC = () => {
                                   e.stopPropagation();
                                   setActivePin(null);
                                 }}
-                                className="text-white/40 hover:text-white text-xs px-1"
+                                className="text-[#4a5d73] hover:text-[#0f1b2b] text-xs px-1"
                               >
                                 ✕
                               </button>
                             </div>
-                            <h4 className="font-serif text-xs font-semibold text-[#faf8f5] mt-0.5">{spot.title}</h4>
-                            <p className="text-[11px] text-white/70 font-sans mt-1 leading-normal">
+                            <h4 className="font-serif text-xs font-semibold text-[#0f1b2b] mt-0.5">{spot.title}</h4>
+                            <p className="text-[11px] text-[#1b2a41]/85 font-sans mt-1 leading-normal">
                               {spot.description}
                             </p>
                           </motion.div>
@@ -378,12 +378,12 @@ export const BridalRunwaySection: React.FC = () => {
                 })}
 
                 {/* Bottom Bar on Photo */}
-                <div className="absolute bottom-3 inset-x-3 flex items-center justify-between px-3 py-1.5 rounded-lg bg-[#0c0a09]/80 backdrop-blur-md border border-white/10 text-[11px]">
-                  <span className="text-white/80 font-sans flex items-center gap-1.5">
+                <div className="absolute bottom-3 inset-x-3 flex items-center justify-between px-3 py-1.5 rounded-lg bg-[#0f1b2b]/85 backdrop-blur-md border border-white/10 text-[11px] text-white">
+                  <span className="text-white/90 font-sans flex items-center gap-1.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-[#dfbe85] animate-pulse" />
                     <span>Tap golden spots for details</span>
                   </span>
-                  <span className="text-[#dfbe85] font-serif text-[10px] uppercase tracking-widest">
+                  <span className="text-[#dfbe85] font-serif text-[10px] uppercase tracking-widest font-medium">
                     4K Ultra-HD
                   </span>
                 </div>
@@ -402,10 +402,10 @@ export const BridalRunwaySection: React.FC = () => {
                   className="space-y-4"
                 >
                   <div>
-                    <span className="text-[10px] uppercase tracking-[0.25em] text-[#dfbe85] font-sans">
+                    <span className="text-[10px] uppercase tracking-[0.25em] text-[#c5a059] font-sans font-medium">
                       {currentLook.ceremony}
                     </span>
-                    <h3 className="font-serif text-2xl sm:text-3xl text-[#faf8f5] mt-0.5">
+                    <h3 className="font-serif text-2xl sm:text-3xl text-[#0f1b2b] mt-0.5">
                       {currentLook.title}
                     </h3>
                   </div>
@@ -416,7 +416,7 @@ export const BridalRunwaySection: React.FC = () => {
                       <motion.span
                         key={i}
                         whileHover={{ scale: 1.25 }}
-                        className="w-5 h-5 rounded-full border border-white/20 shadow inline-block"
+                        className="w-5 h-5 rounded-full border border-black/10 shadow-sm inline-block"
                         style={{ backgroundColor: color }}
                       />
                     ))}
@@ -428,10 +428,10 @@ export const BridalRunwaySection: React.FC = () => {
                       <motion.div
                         key={i}
                         whileHover={{ y: -2 }}
-                        className="p-2 rounded-lg bg-white/[0.03] border border-white/10 flex items-center gap-2 text-xs text-white/80"
+                        className="p-2 rounded-lg bg-[#f5efe6] border border-[#ede4d8] flex items-center gap-2 text-xs text-[#0f1b2b]"
                       >
                         <span>{tech.icon}</span>
-                        <span className="truncate">{tech.name}</span>
+                        <span className="truncate font-medium">{tech.name}</span>
                       </motion.div>
                     ))}
                   </div>
@@ -440,10 +440,10 @@ export const BridalRunwaySection: React.FC = () => {
                   <div className="pt-1">
                     <a
                       href="#contact"
-                      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-[#dfbe85] via-[#f7e3af] to-[#d4af37] text-[#0c0a09] font-medium text-xs uppercase tracking-wider shadow-[0_0_15px_rgba(212,175,55,0.3)] hover:scale-105 transition-all"
+                      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#0f1b2b] hover:bg-[#1a2d47] text-[#faf8f5] border border-[#c5a059]/40 font-medium text-xs uppercase tracking-wider shadow-[0_4px_16px_rgba(15,27,43,0.2)] hover:scale-105 transition-all"
                     >
                       <span>Reserve This Look</span>
-                      <ArrowRight className="w-3 h-3" />
+                      <ArrowRight className="w-3 h-3 text-[#dfbe85]" />
                     </a>
                   </div>
                 </motion.div>
@@ -451,11 +451,11 @@ export const BridalRunwaySection: React.FC = () => {
             </div>
           </div>
 
-          {/* Interactive Layer Pills (Sleek, Compact, No Endless Walls of Text) */}
-          <div className="mt-6 pt-5 border-t border-[#dfbe85]/15">
+          {/* Interactive Layer Pills */}
+          <div className="mt-6 pt-5 border-t border-[#ede4d8]">
             <div className="flex items-center gap-2 mb-3">
-              <Layers className="w-3.5 h-3.5 text-[#dfbe85]" />
-              <span className="text-xs uppercase tracking-wider text-white/80 font-sans">
+              <Layers className="w-3.5 h-3.5 text-[#c5a059]" />
+              <span className="text-xs uppercase tracking-wider text-[#0f1b2b] font-sans font-semibold">
                 4-Phase Longevity Architecture
               </span>
             </div>
@@ -467,15 +467,15 @@ export const BridalRunwaySection: React.FC = () => {
                   onClick={() => setActiveLayer(idx)}
                   className={`p-2.5 rounded-lg text-left transition-all ${
                     activeLayer === idx
-                      ? 'bg-[#dfbe85]/15 border border-[#dfbe85]/60 shadow-[0_0_15px_rgba(212,175,55,0.15)]'
-                      : 'bg-white/[0.02] border border-white/5 hover:border-white/20'
+                      ? 'bg-[#f5efe6] border-2 border-[#c5a059] shadow-sm'
+                      : 'bg-[#f5efe6]/60 border border-[#ede4d8] hover:border-[#c5a059]/50'
                   }`}
                 >
-                  <div className="text-[9px] uppercase tracking-widest text-[#dfbe85]">
+                  <div className="text-[9px] uppercase tracking-widest text-[#c5a059] font-semibold">
                     Step {layer.step}
                   </div>
-                  <div className="font-serif text-xs text-[#faf8f5] mt-0.5">{layer.name}</div>
-                  <div className="text-[10px] text-white/50 font-sans mt-0.5 truncate">
+                  <div className="font-serif text-xs text-[#0f1b2b] font-medium mt-0.5">{layer.name}</div>
+                  <div className="text-[10px] text-[#4a5d73] font-sans mt-0.5 truncate">
                     {layer.detail}
                   </div>
                 </button>
@@ -486,21 +486,21 @@ export const BridalRunwaySection: React.FC = () => {
 
         {/* Minimalist Metrics Strip */}
         <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
-          <div className="p-3 rounded-lg bg-white/[0.02] border border-white/5">
-            <div className="font-serif text-xl sm:text-2xl text-[#dfbe85]">850+</div>
-            <div className="text-[10px] uppercase text-white/50 mt-0.5">Brides Styled</div>
+          <div className="p-3 rounded-lg bg-[#ffffff] border border-[#ede4d8] shadow-sm">
+            <div className="font-serif text-xl sm:text-2xl text-[#0f1b2b] font-medium">850+</div>
+            <div className="text-[10px] uppercase text-[#4a5d73] mt-0.5 font-sans font-medium">Brides Styled</div>
           </div>
-          <div className="p-3 rounded-lg bg-white/[0.02] border border-white/5">
-            <div className="font-serif text-xl sm:text-2xl text-[#dfbe85]">18 Hours</div>
-            <div className="text-[10px] uppercase text-white/50 mt-0.5">Tear & Cry Proof</div>
+          <div className="p-3 rounded-lg bg-[#ffffff] border border-[#ede4d8] shadow-sm">
+            <div className="font-serif text-xl sm:text-2xl text-[#0f1b2b] font-medium">18 Hours</div>
+            <div className="text-[10px] uppercase text-[#4a5d73] mt-0.5 font-sans font-medium">Tear & Cry Proof</div>
           </div>
-          <div className="p-3 rounded-lg bg-white/[0.02] border border-white/5">
-            <div className="font-serif text-xl sm:text-2xl text-[#dfbe85]">4K Cine</div>
-            <div className="text-[10px] uppercase text-white/50 mt-0.5">Zero Flashback</div>
+          <div className="p-3 rounded-lg bg-[#ffffff] border border-[#ede4d8] shadow-sm">
+            <div className="font-serif text-xl sm:text-2xl text-[#0f1b2b] font-medium">4K Cine</div>
+            <div className="text-[10px] uppercase text-[#4a5d73] mt-0.5 font-sans font-medium">Zero Flashback</div>
           </div>
-          <div className="p-3 rounded-lg bg-white/[0.02] border border-white/5">
-            <div className="font-serif text-xl sm:text-2xl text-[#dfbe85]">100%</div>
-            <div className="text-[10px] uppercase text-white/50 mt-0.5">VIP Devotion</div>
+          <div className="p-3 rounded-lg bg-[#ffffff] border border-[#ede4d8] shadow-sm">
+            <div className="font-serif text-xl sm:text-2xl text-[#0f1b2b] font-medium">100%</div>
+            <div className="text-[10px] uppercase text-[#4a5d73] mt-0.5 font-sans font-medium">VIP Devotion</div>
           </div>
         </div>
       </div>

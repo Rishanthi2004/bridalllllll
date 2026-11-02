@@ -36,10 +36,10 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onExploreClick }) => {
   return (
     <section
       onMouseMove={handleMouseMove}
-      className="relative h-screen w-full overflow-hidden flex flex-col justify-between select-none bg-[#0c0a09]"
+      className="relative min-h-[100dvh] h-[100dvh] w-full overflow-hidden flex flex-col justify-between select-none bg-[#faf8f5]"
     >
       {/* 1. Ultra Full-Screen Edge-to-Edge Cinematic Video with Luxury Effects */}
-      <div className="absolute inset-0 z-0 bg-[#0c0a09] overflow-hidden">
+      <div className="absolute inset-0 z-0 bg-[#0f1b2b] overflow-hidden">
         {/* High-res bridal image fallback */}
         <img
           src={highEndBridalPortrait}
@@ -66,7 +66,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onExploreClick }) => {
         <div
           className="absolute inset-0 pointer-events-none transition-opacity duration-500"
           style={{
-            background: `radial-gradient(circle 420px at ${mousePos.x}% ${mousePos.y}%, rgba(223, 190, 133, 0.22) 0%, rgba(212, 175, 55, 0.08) 45%, transparent 70%)`,
+            background: `radial-gradient(circle 420px at ${mousePos.x}% ${mousePos.y}%, rgba(223, 190, 133, 0.22) 0%, rgba(197, 160, 89, 0.08) 45%, transparent 70%)`,
             mixBlendMode: 'screen',
           }}
         />
@@ -74,9 +74,9 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onExploreClick }) => {
         {/* Cinematic Anamorphic Horizontal Golden Flare Streak */}
         <div className="absolute top-1/2 inset-x-0 h-40 -translate-y-1/2 bg-gradient-to-r from-transparent via-[#dfbe85]/15 to-transparent blur-3xl pointer-events-none" />
 
-        {/* Ambient Film Grain & Vignette Scrim */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0c0a09] via-black/30 to-black/60 pointer-events-none" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,rgba(12,10,9,0.85)_100%)] pointer-events-none" />
+        {/* Ambient Film Grain & Vignette Scrim - Fading gracefully to Ivory White #faf8f5 at bottom */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#faf8f5] via-black/25 to-black/60 pointer-events-none" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,rgba(15,27,43,0.55)_100%)] pointer-events-none" />
 
         {/* Floating Ambient Gold Sparks */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
@@ -93,10 +93,10 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onExploreClick }) => {
             initial={{ scaleX: 1 }}
             exit={{ scaleX: 0 }}
             transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
-            className="absolute inset-0 z-50 bg-[#0c0a09] origin-right pointer-events-none flex items-center justify-center"
+            className="absolute inset-0 z-50 bg-[#faf8f5] origin-right pointer-events-none flex items-center justify-center"
           >
-            <div className="flex items-center gap-2 text-[#dfbe85] font-serif tracking-[0.3em] uppercase text-xs">
-              <Sparkles className="w-4 h-4 animate-spin text-[#d4af37]" />
+            <div className="flex items-center gap-2 text-[#0f1b2b] font-serif tracking-[0.3em] uppercase text-xs">
+              <Sparkles className="w-4 h-4 animate-spin text-[#c5a059]" />
               <span>Unveiling Haute Artistry</span>
             </div>
           </motion.div>
@@ -125,12 +125,12 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onExploreClick }) => {
           initial={{ opacity: 0, y: 25 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.1, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
-          className="font-serif text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-normal tracking-tight text-[#faf8f5] max-w-4xl text-balance drop-shadow-[0_4px_35px_rgba(0,0,0,0.9)]"
+          className="font-serif text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-normal tracking-tight text-[#faf8f5] max-w-4xl text-balance drop-shadow-[0_4px_35px_rgba(0,0,0,0.85)]"
         >
           The Art of Bridal Beauty
         </motion.h1>
 
-        {/* One small button: 'Explore Our Work' */}
+        {/* One small button: 'Explore Our Work' in deep navy with gold accent */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -139,10 +139,10 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onExploreClick }) => {
         >
           <button
             onClick={onExploreClick}
-            className="group relative px-7 py-3 text-xs md:text-sm uppercase tracking-[0.2em] font-sans font-medium text-[#0c0a09] bg-gradient-to-r from-[#dfbe85] via-[#f7e3af] to-[#d4af37] rounded-full shadow-[0_0_30px_rgba(212,175,55,0.4)] hover:shadow-[0_0_40px_rgba(212,175,55,0.7)] hover:scale-105 active:scale-95 transition-all duration-300 flex items-center gap-2.5"
+            className="group relative px-7 py-3 text-xs md:text-sm uppercase tracking-[0.2em] font-sans font-medium text-[#faf8f5] bg-[#0f1b2b] hover:bg-[#1a2d47] border border-[#c5a059]/50 rounded-full shadow-[0_8px_30px_rgba(15,27,43,0.3)] hover:shadow-[0_12px_40px_rgba(15,27,43,0.45)] hover:scale-105 active:scale-95 transition-all duration-300 flex items-center gap-2.5"
           >
             <span>Explore Our Work</span>
-            <ArrowDown className="w-3.5 h-3.5 text-[#0c0a09] group-hover:translate-y-0.5 transition-transform" />
+            <ArrowDown className="w-3.5 h-3.5 text-[#dfbe85] group-hover:translate-y-0.5 transition-transform" />
           </button>
         </motion.div>
       </div>

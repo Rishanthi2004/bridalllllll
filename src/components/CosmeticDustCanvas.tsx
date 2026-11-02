@@ -38,12 +38,12 @@ export const CosmeticDustCanvas: React.FC = () => {
     const particleCount = Math.min(45, Math.floor(width / 35));
     const particles: Particle[] = [];
 
-    // Warm champagne, rose gold, soft nude color palette
+    // Warm champagne, rose gold, and soft bronze palette for ivory light theme
     const colors = [
-      { r: 223, g: 190, b: 133 }, // Champagne gold
-      { r: 245, g: 235, b: 225 }, // Soft ivory
-      { r: 232, g: 196, b: 196 }, // Blush rose
-      { r: 212, g: 175, b: 55 },  // Warm gold shimmer
+      { r: 197, g: 160, b: 89 },  // Champagne gold
+      { r: 212, g: 175, b: 55 },  // Royal gold shimmer
+      { r: 216, g: 165, b: 150 }, // Soft rose pearl
+      { r: 175, g: 130, b: 90 },  // Warm bronze accent
     ];
 
     for (let i = 0; i < particleCount; i++) {

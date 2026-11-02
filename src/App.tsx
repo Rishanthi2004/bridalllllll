@@ -27,7 +27,7 @@ export default function App() {
   };
 
   return (
-    <div className="relative min-h-screen bg-[#0c0a09] text-[#f7ebe1] selection:bg-[#d4af37]/30 selection:text-[#fff8f0] overflow-x-hidden font-sans">
+    <div className="relative min-h-screen bg-[#faf8f5] text-[#0f1b2b] selection:bg-[#dfbe85]/35 selection:text-[#0f1b2b] overflow-x-hidden font-sans">
       {/* 1. Global Cosmetic Powder Particle Canvas */}
       <CosmeticDustCanvas />
 

@@ -83,14 +83,35 @@ export const BridalLooksSection: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState(true);
   const [showEnlarged, setShowEnlarged] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [isInView, setIsInView] = useState(false);
 
   const activeItem = KIT_ITEMS[activeIndex];
+  const sectionRef = useRef<HTMLElement | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Automatic animation loop: cycles every 3.5 seconds with live progress tracking
+  // IntersectionObserver: Only activate and show when the user scrolls to this section
   useEffect(() => {
-    if (!isPlaying) {
+    const el = sectionRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsInView(entry.isIntersecting);
+      },
+      {
+        threshold: 0.12,
+        rootMargin: '20px 0px -40px 0px',
+      }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  // Automatic animation loop: cycles every 3.5 seconds with live progress tracking ONLY when in viewport
+  useEffect(() => {
+    if (!isPlaying || !isInView) {
       if (timerRef.current) clearInterval(timerRef.current);
       if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
       return;
@@ -117,7 +138,7 @@ export const BridalLooksSection: React.FC = () => {
       if (timerRef.current) clearInterval(timerRef.current);
       if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
     };
-  }, [isPlaying, activeIndex]);
+  }, [isPlaying, activeIndex, isInView]);
 
   const selectHotspot = (idx: number) => {
     setActiveIndex(idx);
@@ -135,7 +156,17 @@ export const BridalLooksSection: React.FC = () => {
   };
 
   return (
-    <section id="bridal-makeup" className="relative py-12 md:py-20 px-4 md:px-8 max-w-7xl mx-auto overflow-hidden">
+    <section
+      ref={sectionRef}
+      id="bridal-makeup"
+      className="relative min-h-[90vh] py-14 md:py-24 px-4 md:px-8 max-w-7xl mx-auto overflow-hidden flex flex-col justify-center scroll-mt-6"
+    >
+      <motion.div
+        initial={{ opacity: 0, y: 40, scale: 0.98 }}
+        animate={isInView ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 40, scale: 0.98 }}
+        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        className={`w-full transition-opacity duration-500 ${isInView ? 'pointer-events-auto' : 'pointer-events-none'}`}
+      >
       {/* Background Animated Energy Radiance */}
       <motion.div
         animate={{
@@ -175,20 +206,20 @@ export const BridalLooksSection: React.FC = () => {
       </div>
 
       {/* Section Header with Auto-Animation Indicator */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 pb-4 border-b border-[#dfbe85]/15 gap-4 relative z-10">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 pb-4 border-b border-[#ede4d8] gap-4 relative z-10">
         <div>
           <div className="flex items-center gap-2 mb-1.5">
             <motion.div
               animate={{ rotate: 360 }}
               transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
             >
-              <Flame className="w-4 h-4 text-[#e08f65]" />
+              <Flame className="w-4 h-4 text-[#c5a059]" />
             </motion.div>
-            <span className="text-[11px] uppercase tracking-[0.25em] text-[#dfbe85] font-sans font-medium">
+            <span className="text-[11px] uppercase tracking-[0.25em] text-[#c5a059] font-sans font-medium">
               Explosive Pigments & Kit
             </span>
           </div>
-          <h2 className="font-serif text-2xl sm:text-4xl md:text-5xl text-[#faf8f5] tracking-tight">
+          <h2 className="font-serif text-2xl sm:text-4xl md:text-5xl text-[#0f1b2b] tracking-tight">
             Artisan Cosmetic Instruments
           </h2>
         </div>
@@ -196,13 +227,13 @@ export const BridalLooksSection: React.FC = () => {
         {/* Automatic Animation Status & Playback Control */}
         <div className="flex items-center gap-2 self-start sm:self-auto">
           {/* Animated Status Pill */}
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/60 border border-white/10 backdrop-blur-md">
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/90 border border-[#ede4d8] backdrop-blur-md shadow-sm">
             <motion.span
               animate={{ scale: isPlaying ? [1, 1.4, 1] : 1, opacity: isPlaying ? [1, 0.5, 1] : 0.4 }}
               transition={{ duration: 1.5, repeat: Infinity }}
-              className={`w-2 h-2 rounded-full ${isPlaying ? 'bg-emerald-400 shadow-[0_0_8px_#34d399]' : 'bg-amber-400'}`}
+              className={`w-2 h-2 rounded-full ${isPlaying ? 'bg-emerald-500 shadow-[0_0_8px_#10b981]' : 'bg-amber-400'}`}
             />
-            <span className="text-[11px] font-sans tracking-wider uppercase text-white/70">
+            <span className="text-[11px] font-sans tracking-wider uppercase text-[#1b2a41] font-medium">
               {isPlaying ? 'Auto-Cycle Active' : 'Paused'}
             </span>
           </div>
@@ -211,11 +242,11 @@ export const BridalLooksSection: React.FC = () => {
           <motion.button
             whileTap={{ scale: 0.9 }}
             onClick={() => setIsPlaying(!isPlaying)}
-            className="p-2 rounded-full bg-white/5 hover:bg-white/15 border border-white/10 text-white/80 hover:text-white transition-colors"
+            className="p-2 rounded-full bg-white hover:bg-[#f5efe6] border border-[#ede4d8] text-[#0f1b2b] shadow-sm transition-colors"
             title={isPlaying ? 'Pause Auto Animation' : 'Start Auto Animation'}
             aria-label="Toggle auto play"
           >
-            {isPlaying ? <Pause className="w-3.5 h-3.5 text-[#dfbe85]" /> : <Play className="w-3.5 h-3.5 text-[#dfbe85]" />}
+            {isPlaying ? <Pause className="w-3.5 h-3.5 text-[#0f1b2b]" /> : <Play className="w-3.5 h-3.5 text-[#0f1b2b]" />}
           </motion.button>
         </div>
       </div>
@@ -225,7 +256,7 @@ export const BridalLooksSection: React.FC = () => {
         
         {/* Left Column: Explosive Pigments Image with Automatic Animated Hotspots */}
         <div className="lg:col-span-7">
-          <div className="relative aspect-square max-w-[480px] mx-auto rounded-2xl overflow-hidden bg-black/90 border border-[#dfbe85]/30 shadow-[0_0_50px_rgba(200,124,79,0.25)] group">
+          <div className="relative aspect-square max-w-[480px] mx-auto rounded-2xl overflow-hidden bg-black/95 border border-[#ede4d8] shadow-[0_15px_45px_rgba(15,27,43,0.12)] group">
             
             {/* Automatic Radial Gold & Terracotta Shockwave */}
             <motion.div
@@ -298,21 +329,21 @@ export const BridalLooksSection: React.FC = () => {
 
                     {/* Constant subtle pulse on inactive hotspots */}
                     {!isSelected && (
-                      <span className="absolute -inset-1 rounded-full bg-white/20 animate-ping opacity-50 pointer-events-none" />
+                      <span className="absolute -inset-1 rounded-full bg-white/30 animate-ping opacity-60 pointer-events-none" />
                     )}
 
                     {/* Central Pin Core */}
                     <motion.div
                       animate={{
                         scale: isSelected ? 1.25 : 1,
-                        backgroundColor: isSelected ? '#dfbe85' : 'rgba(12, 10, 9, 0.85)',
-                        color: isSelected ? '#0c0a09' : '#dfbe85',
+                        backgroundColor: isSelected ? '#0f1b2b' : 'rgba(255, 255, 255, 0.92)',
+                        color: isSelected ? '#faf8f5' : '#0f1b2b',
                       }}
                       transition={{ duration: 0.3 }}
-                      className="relative flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-[#dfbe85] shadow-[0_0_15px_rgba(223,190,133,0.5)] font-bold text-xs"
+                      className="relative flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full border-2 border-[#dfbe85] shadow-[0_4px_12px_rgba(0,0,0,0.35)] font-bold text-xs"
                     >
                       {isSelected ? (
-                        <Sparkles className="w-4 h-4 animate-spin" style={{ animationDuration: '4s' }} />
+                        <Sparkles className="w-3.5 h-3.5 text-[#dfbe85] animate-spin" style={{ animationDuration: '4s' }} />
                       ) : (
                         <span className="font-mono text-[10px]">{idx + 1}</span>
                       )}
@@ -324,9 +355,9 @@ export const BridalLooksSection: React.FC = () => {
                     <motion.div
                       initial={{ opacity: 0, y: 6, scale: 0.9 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
-                      className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-2.5 py-1 rounded-md bg-black/90 backdrop-blur-md border border-[#dfbe85]/40 whitespace-nowrap shadow-xl pointer-events-none hidden sm:block"
+                      className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-2.5 py-1 rounded-md bg-[#0f1b2b] backdrop-blur-md border border-[#dfbe85]/50 whitespace-nowrap shadow-xl pointer-events-none hidden sm:block"
                     >
-                      <span className="text-[10px] font-sans font-medium text-[#dfbe85] tracking-wider uppercase">
+                      <span className="text-[10px] font-sans font-medium text-[#faf8f5] tracking-wider uppercase">
                         {item.name}
                       </span>
                     </motion.div>
@@ -339,16 +370,16 @@ export const BridalLooksSection: React.FC = () => {
             <motion.button
               whileTap={{ scale: 0.95 }}
               onClick={() => setShowEnlarged(true)}
-              className="absolute bottom-3 right-3 px-2.5 py-1.5 rounded-full bg-black/75 hover:bg-black/95 backdrop-blur-md border border-white/20 text-white text-xs font-sans flex items-center gap-1.5 transition-colors z-20 shadow-lg"
+              className="absolute bottom-3 right-3 px-2.5 py-1.5 rounded-full bg-black/80 hover:bg-black backdrop-blur-md border border-white/20 text-white text-xs font-sans flex items-center gap-1.5 transition-colors z-20 shadow-lg"
             >
               <ZoomIn className="w-3.5 h-3.5 text-[#dfbe85]" />
               <span className="hidden sm:inline">Enlarge</span>
             </motion.button>
 
             {/* Bottom Progress Bar inside image frame */}
-            <div className="absolute bottom-0 inset-x-0 h-1 bg-white/10 z-20">
+            <div className="absolute bottom-0 inset-x-0 h-1 bg-white/20 z-20">
               <motion.div
-                className="h-full bg-gradient-to-r from-[#dfbe85] to-[#c87c4f]"
+                className="h-full bg-gradient-to-r from-[#dfbe85] to-[#c5a059]"
                 style={{ width: `${progress}%` }}
               />
             </div>
@@ -358,7 +389,7 @@ export const BridalLooksSection: React.FC = () => {
           <div className="flex items-center justify-center gap-2 mt-4">
             <button
               onClick={handlePrev}
-              className="p-1 rounded-full text-white/50 hover:text-white transition-colors"
+              className="p-1 rounded-full text-[#1b2a41]/50 hover:text-[#0f1b2b] transition-colors"
               aria-label="Previous pigment"
             >
               <ChevronLeft className="w-4 h-4" />
@@ -371,8 +402,8 @@ export const BridalLooksSection: React.FC = () => {
                   onClick={() => selectHotspot(idx)}
                   className={`h-2 rounded-full transition-all duration-300 ${
                     activeIndex === idx
-                      ? 'w-7 bg-gradient-to-r from-[#dfbe85] to-[#c87c4f]'
-                      : 'w-2 bg-white/20 hover:bg-white/40'
+                      ? 'w-7 bg-[#0f1b2b]'
+                      : 'w-2 bg-[#ede4d8] hover:bg-[#c5a059]'
                   }`}
                   aria-label={`Select ${item.name}`}
                 />
@@ -381,7 +412,7 @@ export const BridalLooksSection: React.FC = () => {
 
             <button
               onClick={handleNext}
-              className="p-1 rounded-full text-white/50 hover:text-white transition-colors"
+              className="p-1 rounded-full text-[#1b2a41]/50 hover:text-[#0f1b2b] transition-colors"
               aria-label="Next pigment"
             >
               <ChevronRight className="w-4 h-4" />
@@ -391,21 +422,21 @@ export const BridalLooksSection: React.FC = () => {
 
         {/* Right Column: Automatically Animated Formulation Details Card */}
         <div className="lg:col-span-5">
-          <div className="relative bg-[#120f0d]/90 rounded-2xl p-6 sm:p-7 border border-[#dfbe85]/25 shadow-2xl backdrop-blur-xl overflow-hidden">
+          <div className="relative bg-[#ffffff] rounded-2xl p-6 sm:p-7 border border-[#ede4d8] shadow-[0_12px_40px_rgba(15,27,43,0.06)] backdrop-blur-xl overflow-hidden">
             
             {/* Subtle background glow */}
             <div
-              className="absolute -top-12 -right-12 w-48 h-48 rounded-full blur-3xl opacity-30 pointer-events-none transition-colors duration-700"
+              className="absolute -top-12 -right-12 w-48 h-48 rounded-full blur-3xl opacity-15 pointer-events-none transition-colors duration-700"
               style={{ backgroundColor: activeItem.hex }}
             />
 
             {/* Top Auto-Cycle Countdown Badge */}
-            <div className="flex items-center justify-between mb-4 pb-3 border-b border-white/10">
-              <span className="text-[11px] font-mono tracking-widest uppercase text-[#dfbe85] flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-[#dfbe85]" />
+            <div className="flex items-center justify-between mb-4 pb-3 border-b border-[#ede4d8]">
+              <span className="text-[11px] font-mono tracking-widest uppercase text-[#c5a059] font-medium flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-[#c5a059]" />
                 {activeItem.badge}
               </span>
-              <span className="text-[11px] font-sans text-white/40">
+              <span className="text-[11px] font-sans text-[#4a5d73]">
                 0{activeIndex + 1} / 0{KIT_ITEMS.length}
               </span>
             </div>
@@ -421,29 +452,29 @@ export const BridalLooksSection: React.FC = () => {
                 className="space-y-4"
               >
                 <div>
-                  <span className="px-2.5 py-0.5 rounded-full bg-[#c87c4f]/20 border border-[#c87c4f]/40 text-[#dfbe85] text-[10px] uppercase font-mono tracking-wide">
+                  <span className="px-2.5 py-0.5 rounded-full bg-[#f5efe6] border border-[#ede4d8] text-[#0f1b2b] text-[10px] uppercase font-mono tracking-wide font-medium">
                     {activeItem.category}
                   </span>
-                  <h3 className="font-serif text-2xl sm:text-3xl text-white mt-2 leading-snug">
+                  <h3 className="font-serif text-2xl sm:text-3xl text-[#0f1b2b] mt-2 leading-snug">
                     {activeItem.name}
                   </h3>
-                  <p className="mt-2 text-sm text-white/80 font-sans leading-relaxed">
+                  <p className="mt-2 text-sm text-[#1b2a41]/85 font-sans leading-relaxed">
                     {activeItem.description}
                   </p>
                 </div>
 
                 {/* Swatch & Key Highlight */}
-                <div className="p-3 rounded-xl bg-white/[0.04] border border-white/10 flex items-center justify-between gap-3">
+                <div className="p-3 rounded-xl bg-[#f5efe6] border border-[#ede4d8] flex items-center justify-between gap-3">
                   <div className="flex items-center gap-2.5">
                     <div
-                      className="w-7 h-7 rounded-lg shadow-md border border-white/30 shrink-0"
+                      className="w-7 h-7 rounded-lg shadow-sm border border-black/10 shrink-0"
                       style={{ backgroundColor: activeItem.hex }}
                     />
                     <div>
-                      <span className="text-[10px] uppercase tracking-wider text-white/40 block">
+                      <span className="text-[10px] uppercase tracking-wider text-[#4a5d73] block">
                         Signature Pigment
                       </span>
-                      <span className="text-xs font-serif text-white/95">
+                      <span className="text-xs font-serif text-[#0f1b2b] font-medium">
                         {activeItem.highlight}
                       </span>
                     </div>
@@ -451,7 +482,7 @@ export const BridalLooksSection: React.FC = () => {
                   <motion.div
                     animate={{ rotate: [0, 10, -10, 0] }}
                     transition={{ duration: 3, repeat: Infinity }}
-                    className="p-1.5 rounded-full bg-[#dfbe85]/15 text-[#dfbe85]"
+                    className="p-1.5 rounded-full bg-[#ede4d8] text-[#c5a059]"
                   >
                     <Flame className="w-4 h-4" />
                   </motion.div>
@@ -459,21 +490,21 @@ export const BridalLooksSection: React.FC = () => {
 
                 {/* Two Simple Feature Badges */}
                 <div className="grid grid-cols-2 gap-2 pt-1 text-xs font-sans">
-                  <div className="flex items-center gap-2 p-2.5 rounded-lg bg-black/40 border border-white/10">
-                    <ShieldCheck className="w-3.5 h-3.5 text-[#dfbe85] shrink-0" />
-                    <span className="text-white/80 truncate">18H Banquet Sealed</span>
+                  <div className="flex items-center gap-2 p-2.5 rounded-lg bg-[#f5efe6] border border-[#ede4d8]">
+                    <ShieldCheck className="w-3.5 h-3.5 text-[#c5a059] shrink-0" />
+                    <span className="text-[#0f1b2b] truncate font-medium">18H Banquet Sealed</span>
                   </div>
-                  <div className="flex items-center gap-2 p-2.5 rounded-lg bg-black/40 border border-white/10">
-                    <Droplets className="w-3.5 h-3.5 text-[#dfbe85] shrink-0" />
-                    <span className="text-white/80 truncate">Micro-Milled Pearl</span>
+                  <div className="flex items-center gap-2 p-2.5 rounded-lg bg-[#f5efe6] border border-[#ede4d8]">
+                    <Droplets className="w-3.5 h-3.5 text-[#c5a059] shrink-0" />
+                    <span className="text-[#0f1b2b] truncate font-medium">Micro-Milled Pearl</span>
                   </div>
                 </div>
               </motion.div>
             </AnimatePresence>
 
             {/* Quick Interactive Selector Strip */}
-            <div className="mt-5 pt-4 border-t border-white/10">
-              <span className="text-[10px] uppercase tracking-wider text-white/40 block mb-2 font-sans">
+            <div className="mt-5 pt-4 border-t border-[#ede4d8]">
+              <span className="text-[10px] uppercase tracking-wider text-[#4a5d73] block mb-2 font-sans font-medium">
                 Select Formula to Inspect
               </span>
               <div className="grid grid-cols-5 gap-1.5">
@@ -485,15 +516,15 @@ export const BridalLooksSection: React.FC = () => {
                       onClick={() => selectHotspot(idx)}
                       className={`relative py-1.5 px-1 rounded-lg text-center transition-all ${
                         isCur
-                          ? 'bg-[#dfbe85] text-[#0c0a09] font-medium shadow-md'
-                          : 'bg-white/5 text-white/60 hover:bg-white/10 hover:text-white'
+                          ? 'bg-[#0f1b2b] text-[#faf8f5] font-semibold shadow-sm'
+                          : 'bg-[#f5efe6] text-[#1b2a41] hover:bg-[#ede4d8]'
                       }`}
                     >
                       <span className="text-[10px] block font-mono">0{idx + 1}</span>
                       {isCur && (
                         <motion.div
                           layoutId="activePill"
-                          className="absolute inset-0 border border-[#dfbe85] rounded-lg pointer-events-none"
+                          className="absolute inset-0 border border-[#0f1b2b] rounded-lg pointer-events-none"
                         />
                       )}
                     </button>
@@ -513,18 +544,18 @@ export const BridalLooksSection: React.FC = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setShowEnlarged(false)}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md"
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="relative max-w-2xl w-full bg-[#110e0c] rounded-2xl overflow-hidden border border-[#dfbe85]/40 shadow-2xl"
+              className="relative max-w-2xl w-full bg-[#faf8f5] rounded-2xl overflow-hidden border border-[#ede4d8] shadow-2xl"
             >
               <button
                 onClick={() => setShowEnlarged(false)}
-                className="absolute top-4 right-4 z-10 p-2 rounded-full bg-black/70 text-white/80 hover:text-white hover:bg-black transition-colors"
+                className="absolute top-4 right-4 z-10 p-2 rounded-full bg-black/60 text-white hover:bg-black transition-colors"
                 aria-label="Close modal"
               >
                 <X className="w-5 h-5" />
@@ -536,16 +567,16 @@ export const BridalLooksSection: React.FC = () => {
                   className="w-full h-full object-cover"
                 />
               </div>
-              <div className="p-4 bg-black/80 flex items-center justify-between">
+              <div className="p-4 bg-[#f5efe6] border-t border-[#ede4d8] flex items-center justify-between">
                 <div>
-                  <h4 className="font-serif text-white text-base">
+                  <h4 className="font-serif text-[#0f1b2b] text-base font-medium">
                     Haute Cosmetic Shockwave
                   </h4>
-                  <p className="text-xs text-white/60 font-sans">
+                  <p className="text-xs text-[#1b2a41]/75 font-sans">
                     MAC Velvet Bullet, Prismatic Glaze & 24K Micro-Milled Gold Dust
                   </p>
                 </div>
-                <span className="px-2.5 py-1 rounded bg-[#dfbe85]/20 text-[#dfbe85] text-xs font-mono">
+                <span className="px-2.5 py-1 rounded bg-[#0f1b2b] text-[#faf8f5] text-xs font-mono font-medium">
                   Master Collection
                 </span>
               </div>
@@ -553,6 +584,7 @@ export const BridalLooksSection: React.FC = () => {
           </motion.div>
         )}
       </AnimatePresence>
+      </motion.div>
     </section>
   );
 };

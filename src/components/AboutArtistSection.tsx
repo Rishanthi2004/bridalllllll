@@ -25,10 +25,10 @@ export const AboutArtistSection: React.FC = () => {
       <motion.div
         animate={{
           scale: [1, 1.2, 1],
-          opacity: [0.12, 0.22, 0.12],
+          opacity: [0.08, 0.16, 0.08],
         }}
         transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
-        className="absolute top-1/4 left-1/3 w-80 h-80 rounded-full bg-radial from-[#dfbe85]/25 to-transparent blur-3xl pointer-events-none"
+        className="absolute top-1/4 left-1/3 w-80 h-80 rounded-full bg-radial from-[#dfbe85]/20 to-transparent blur-3xl pointer-events-none"
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center relative z-10">
@@ -37,13 +37,13 @@ export const AboutArtistSection: React.FC = () => {
           <motion.div
             animate={{ y: [0, -6, 0] }}
             transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
-            className="relative aspect-[3/4] rounded-2xl overflow-hidden bg-[#14100d] border border-[#dfbe85]/30 shadow-2xl group"
+            className="relative aspect-[3/4] rounded-2xl overflow-hidden bg-[#ffffff] border border-[#ede4d8] shadow-xl group"
           >
             <img
               src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=1000&q=85"
               alt="Maison Master Bridal Makeup Artist Aria Laurent"
               referrerPolicy="no-referrer"
-              className="w-full h-full object-cover object-top filter contrast-[1.08] transition-transform duration-700 group-hover:scale-104"
+              className="w-full h-full object-cover object-top filter contrast-[1.05] transition-transform duration-700 group-hover:scale-104"
             />
 
             {/* Studio Light Beam Sweep */}
@@ -53,27 +53,27 @@ export const AboutArtistSection: React.FC = () => {
               className="absolute inset-y-0 w-28 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-25 pointer-events-none"
             />
 
-            <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
 
             {/* Artist Info */}
-            <div className="absolute bottom-5 left-5 right-5">
+            <div className="absolute bottom-5 left-5 right-5 text-white">
               <div className="flex items-center gap-1.5 mb-1">
                 <span className="w-2 h-2 rounded-full bg-[#dfbe85] animate-ping" />
-                <span className="text-[10px] uppercase tracking-[0.2em] text-[#dfbe85] font-sans">
+                <span className="text-[10px] uppercase tracking-[0.2em] text-[#dfbe85] font-sans font-medium">
                   Master Artist & Creative Director
                 </span>
               </div>
               <h3 className="font-serif text-2xl text-white font-normal">
                 Aria Laurent
               </h3>
-              <p className="text-[11px] text-white/60 font-sans mt-0.5">
+              <p className="text-[11px] text-white/70 font-sans mt-0.5">
                 Paris & International Atelier
               </p>
             </div>
           </motion.div>
 
           {/* Rotating Atelier Crest */}
-          <div className="absolute -top-4 -right-4 w-20 h-20 rounded-full bg-[#14100d]/90 backdrop-blur-md border border-[#dfbe85]/40 flex items-center justify-center p-1.5 shadow-xl">
+          <div className="absolute -top-4 -right-4 w-20 h-20 rounded-full bg-[#ffffff] backdrop-blur-md border border-[#ede4d8] flex items-center justify-center p-1.5 shadow-xl">
             <motion.div
               animate={{ rotate: 360 }}
               transition={{ duration: 16, repeat: Infinity, ease: 'linear' }}
@@ -85,7 +85,7 @@ export const AboutArtistSection: React.FC = () => {
                   d="M 50, 50 m -37, 0 a 37,37 0 1,1 74,0 a 37,37 0 1,1 -74,0"
                   fill="none"
                 />
-                <text fill="#dfbe85" fontSize="8.5" fontFamily="Cormorant Garamond, serif" letterSpacing="2.2">
+                <text fill="#0f1b2b" fontSize="8.5" fontFamily="Cormorant Garamond, serif" letterSpacing="2.2" fontWeight="600">
                   <textPath href="#aboutTextPath" startOffset="0%">
                     ÉLÉGANCE · HAUTE ARTISTRY ·
                   </textPath>
@@ -96,40 +96,40 @@ export const AboutArtistSection: React.FC = () => {
             <motion.div
               animate={{ scale: [1, 1.2, 1] }}
               transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-              className="relative z-10 w-7 h-7 rounded-full bg-gradient-to-tr from-[#38260b] to-[#d4af37] p-1 flex items-center justify-center shadow-lg"
+              className="relative z-10 w-7 h-7 rounded-full bg-[#0f1b2b] p-1 flex items-center justify-center shadow-lg"
             >
-              <Sparkles className="w-3.5 h-3.5 text-[#fff8eb]" />
+              <Sparkles className="w-3.5 h-3.5 text-[#dfbe85]" />
             </motion.div>
           </div>
 
           {/* Feature Badge */}
-          <div className="absolute -bottom-2 -left-2 px-2.5 py-1 rounded-full bg-black/80 border border-[#dfbe85]/30 backdrop-blur-md text-[10px] font-sans text-[#dfbe85] flex items-center gap-1 shadow-lg">
-            <Star className="w-2.5 h-2.5 fill-[#dfbe85]" />
+          <div className="absolute -bottom-2 -left-2 px-2.5 py-1 rounded-full bg-[#ffffff] border border-[#ede4d8] shadow-md text-[10px] font-sans text-[#0f1b2b] flex items-center gap-1 font-medium">
+            <Star className="w-2.5 h-2.5 fill-[#c5a059] text-[#c5a059]" />
             <span>Vogue Featured</span>
           </div>
         </div>
 
-        {/* Right: Minimalist Philosophy (Short & Crisp) */}
+        {/* Right: Minimalist Philosophy */}
         <div className="lg:col-span-7 flex flex-col justify-center space-y-5">
           <div className="flex items-center gap-1.5">
-            <Award className="w-4 h-4 text-[#d4af37]" />
-            <span className="text-xs uppercase tracking-[0.25em] text-[#dfbe85] font-sans">
+            <Award className="w-4 h-4 text-[#c5a059]" />
+            <span className="text-xs uppercase tracking-[0.25em] text-[#c5a059] font-sans font-medium">
               About The Artist
             </span>
           </div>
 
-          <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl text-[#faf8f5] tracking-tight leading-snug">
+          <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl text-[#0f1b2b] tracking-tight leading-snug">
             "Bridal beauty is the unveiling of your most luminous self."
           </h2>
 
-          <p className="text-sm sm:text-base text-white/70 font-sans font-light leading-relaxed">
+          <p className="text-sm sm:text-base text-[#1b2a41]/85 font-sans font-light leading-relaxed">
             Trained in Paris and Milan, Aria Laurent crafts weightless, couture radiance balanced for heirloom jewelry, banquet lighting, and 18-hour ceremonial wear.
           </p>
 
           {/* Auto-Cycling Principles */}
-          <div className="p-3.5 rounded-xl bg-white/[0.03] border border-[#dfbe85]/20">
+          <div className="p-3.5 rounded-xl bg-[#ffffff] border border-[#ede4d8] shadow-sm">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-[10px] uppercase tracking-widest text-[#dfbe85] font-sans">
+              <span className="text-[10px] uppercase tracking-widest text-[#c5a059] font-sans font-semibold">
                 Signature Principles
               </span>
               <div className="flex items-center gap-1">
@@ -138,7 +138,7 @@ export const AboutArtistSection: React.FC = () => {
                     key={i}
                     onClick={() => setActiveTab(i)}
                     className={`h-1.5 rounded-full transition-all duration-300 ${
-                      activeTab === i ? 'w-5 bg-[#dfbe85]' : 'w-1.5 bg-white/20'
+                      activeTab === i ? 'w-5 bg-[#0f1b2b]' : 'w-1.5 bg-[#ede4d8]'
                     }`}
                   />
                 ))}
@@ -152,38 +152,38 @@ export const AboutArtistSection: React.FC = () => {
               exit={{ opacity: 0, x: -8 }}
               transition={{ duration: 0.3 }}
             >
-              <h4 className="font-serif text-base text-white">
+              <h4 className="font-serif text-base text-[#0f1b2b] font-medium">
                 0{activeTab + 1}. {philosophyPillars[activeTab].title}
               </h4>
-              <p className="text-xs text-white/60 font-sans mt-0.5">
+              <p className="text-xs text-[#4a5d73] font-sans mt-0.5">
                 {philosophyPillars[activeTab].desc}
               </p>
             </motion.div>
           </div>
 
           {/* Credentials */}
-          <div className="pt-4 border-t border-white/10 grid grid-cols-3 gap-4 text-left">
+          <div className="pt-4 border-t border-[#ede4d8] grid grid-cols-3 gap-4 text-left">
             <div>
-              <span className="font-serif text-2xl text-[#dfbe85] block tabular-nums">
+              <span className="font-serif text-2xl text-[#0f1b2b] font-medium block tabular-nums">
                 12+
               </span>
-              <span className="text-[11px] text-white/50 font-sans block">
+              <span className="text-[11px] text-[#4a5d73] font-sans block">
                 Haute Seasons
               </span>
             </div>
             <div>
-              <span className="font-serif text-2xl text-[#dfbe85] block tabular-nums">
+              <span className="font-serif text-2xl text-[#0f1b2b] font-medium block tabular-nums">
                 450+
               </span>
-              <span className="text-[11px] text-white/50 font-sans block">
+              <span className="text-[11px] text-[#4a5d73] font-sans block">
                 Brides Styled
               </span>
             </div>
             <div>
-              <span className="font-serif text-2xl text-[#dfbe85] block tabular-nums">
+              <span className="font-serif text-2xl text-[#0f1b2b] font-medium block tabular-nums">
                 100%
               </span>
-              <span className="text-[11px] text-white/50 font-sans block">
+              <span className="text-[11px] text-[#4a5d73] font-sans block">
                 Couture Care
               </span>
             </div>

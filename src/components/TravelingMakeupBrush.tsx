@@ -1,132 +1,226 @@
-import React, { useEffect, useRef, useState, useMemo } from 'react';
-import { motion, useScroll, useSpring, useTransform } from 'motion/react';
+import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react';
 
 interface Waypoint {
-  progress: number;
+  progress: number; // 0.0 to 1.0 spanning strictly from Explosive Pigments & Kit to Bridal Runway
   xPercent: number;
   yPercent: number;
   rotation: number;
   scale: number;
   opacity: number;
-  powderPuff: boolean;
+  isPuffing?: boolean;
 }
 
 export const TravelingMakeupBrush: React.FC = () => {
-  const { scrollYProgress } = useScroll();
-  const [scrollVelocity, setScrollVelocity] = useState(0);
-  const lastScrollY = useRef(0);
-  const lastTime = useRef(Date.now());
   const trailCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const brushContainerRef = useRef<HTMLDivElement | null>(null);
 
-  // Smooth scroll progress
-  const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 90,
-    damping: 24,
-    restDelta: 0.001,
+  // Smooth interpolated position state
+  const [journeyProgress, setJourneyProgress] = useState(-1); // -1 = outside/hidden
+  const [brushState, setBrushState] = useState({
+    x: -20,
+    y: 50,
+    rotation: -25,
+    scale: 1,
+    opacity: 0,
+    isVisible: false,
   });
 
-  // Keyframe waypoints: starts from Page 2 (Bridal Looks), NOT in the Hero section
+  const [scrollVelocity, setScrollVelocity] = useState(0);
+  const lastScrollY = useRef(0);
+  const lastScrollTime = useRef(Date.now());
+  const velocityRef = useRef(0);
+  const isMovingRef = useRef(false);
+  const idleTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Dynamic Waypoints: Strictly designed for:
+  // START: Explosive Pigments & Kit (#bridal-makeup)
+  // JOURNEY: Fluid calligraphy S-curves dusting the pigments, compacts, and runway stage
+  // END: Bridal Runway (#runway) grand flourish exit
   const waypoints: Waypoint[] = useMemo(
     () => [
-      // Hero Section (Page 1) - Brush is completely hidden / not started
-      { progress: 0.0, xPercent: -15, yPercent: 45, rotation: -35, scale: 0.95, opacity: 0, powderPuff: false },
-      { progress: 0.13, xPercent: -10, yPercent: 45, rotation: -35, scale: 0.95, opacity: 0, powderPuff: false },
-      
-      // Page 2 (Bridal Looks / Aesthetics) - Brush enters from the side and sweeps across
-      { progress: 0.17, xPercent: 20, yPercent: 50, rotation: -18, scale: 1.1, opacity: 1, powderPuff: true },
-      { progress: 0.25, xPercent: 74, yPercent: 42, rotation: 22, scale: 1.15, opacity: 1, powderPuff: true },
-      
-      // Page 3 (Transformations) - Continues through transformation wipe
-      { progress: 0.33, xPercent: 24, yPercent: 54, rotation: -26, scale: 1.15, opacity: 1, powderPuff: true },
-      { progress: 0.40, xPercent: 70, yPercent: 46, rotation: 18, scale: 1.05, opacity: 0.9, powderPuff: true },
-      
-      // Graceful exit at the completion of the 2-page journey
-      { progress: 0.46, xPercent: 112, yPercent: 36, rotation: 42, scale: 0.9, opacity: 0, powderPuff: false },
-      
-      // Remains completely hidden for remaining sections (Atelier, Portfolio, About, Contact)
-      { progress: 1.0, xPercent: 120, yPercent: 36, rotation: 42, scale: 0.8, opacity: 0, powderPuff: false },
+      // 0.00: Hidden off-screen just as Explosive Pigments & Kit enters viewport
+      { progress: 0.00, xPercent: -12, yPercent: 42, rotation: -32, scale: 0.9, opacity: 0 },
+      // 0.06: Glides gracefully into the Explosive Pigments header with initial bristle tilt
+      { progress: 0.06, xPercent: 16, yPercent: 36, rotation: -24, scale: 1.05, opacity: 0.9, isPuffing: true },
+      // 0.16: Dips into the central mineral pigment explosion (artisan powder puff)
+      { progress: 0.16, xPercent: 34, yPercent: 48, rotation: -12, scale: 1.15, opacity: 1, isPuffing: true },
+      // 0.26: Sweeps across the high-impact lip gloss & eye foil compacts
+      { progress: 0.26, xPercent: 72, yPercent: 38, rotation: 18, scale: 1.18, opacity: 1, isPuffing: true },
+      // 0.36: Gentle downward swoop across the moisture-matte lipstick bullet
+      { progress: 0.36, xPercent: 54, yPercent: 62, rotation: -6, scale: 1.12, opacity: 1, isPuffing: true },
+      // 0.46: Calligraphic S-curve glide transitioning into The Bridal Runway stage
+      { progress: 0.46, xPercent: 24, yPercent: 52, rotation: -22, scale: 1.08, opacity: 1 },
+      // 0.58: Sweeps onto the Bridal Runway spotlight bride
+      { progress: 0.58, xPercent: 44, yPercent: 40, rotation: 10, scale: 1.16, opacity: 1, isPuffing: true },
+      // 0.70: Glides across the 4K banquet lighting and temple eye details
+      { progress: 0.70, xPercent: 74, yPercent: 48, rotation: 24, scale: 1.2, opacity: 1, isPuffing: true },
+      // 0.82: Elegant swirl across veil & jewelry anchoring features
+      { progress: 0.82, xPercent: 38, yPercent: 56, rotation: -16, scale: 1.1, opacity: 1, isPuffing: true },
+      // 0.90: Prepares for grand finale flourish, tilting gracefully upward
+      { progress: 0.90, xPercent: 64, yPercent: 35, rotation: 16, scale: 1.05, opacity: 0.95 },
+      // 0.96: Spectacular upward arc leaving final stardust trail
+      { progress: 0.96, xPercent: 88, yPercent: 24, rotation: 32, scale: 0.98, opacity: 0.75 },
+      // 1.00: Completes runway finale and vanishes before packages/footer
+      { progress: 1.00, xPercent: 110, yPercent: 15, rotation: 44, scale: 0.85, opacity: 0 },
     ],
     []
   );
 
-  const [currentPos, setCurrentPos] = useState({
-    x: -15,
-    y: 45,
-    rotation: -35,
-    scale: 0.95,
-    opacity: 0,
-    isPuffing: false,
-  });
+  // Calculate current brush position from normalized progress [0, 1]
+  const interpolatePosition = useCallback(
+    (progress: number) => {
+      if (progress < 0 || progress > 1) {
+        return {
+          x: progress < 0 ? waypoints[0].xPercent : waypoints[waypoints.length - 1].xPercent,
+          y: progress < 0 ? waypoints[0].yPercent : waypoints[waypoints.length - 1].yPercent,
+          rotation: progress < 0 ? waypoints[0].rotation : waypoints[waypoints.length - 1].rotation,
+          scale: 1,
+          opacity: 0,
+          isVisible: false,
+        };
+      }
 
-  // Track scroll velocity for realistic physical motion blur & powder release
-  useEffect(() => {
-    let animId: number;
-    const checkVelocity = () => {
-      const currentScrollY = window.scrollY;
-      const now = Date.now();
-      const dt = Math.max(16, now - lastTime.current);
-      const dy = Math.abs(currentScrollY - lastScrollY.current);
-      const velocity = dy / dt;
-
-      setScrollVelocity((prev) => prev * 0.8 + velocity * 0.2);
-
-      lastScrollY.current = currentScrollY;
-      lastTime.current = now;
-      animId = requestAnimationFrame(checkVelocity);
-    };
-
-    animId = requestAnimationFrame(checkVelocity);
-    return () => cancelAnimationFrame(animId);
-  }, []);
-
-  // Subscribe to smooth scroll progress to interpolate position
-  useEffect(() => {
-    const unsubscribe = smoothProgress.on('change', (p: number) => {
-      // Find bounding waypoints
+      // Find waypoint bracket
       let i = 0;
-      while (i < waypoints.length - 1 && waypoints[i + 1].progress <= p) {
+      while (i < waypoints.length - 1 && waypoints[i + 1].progress <= progress) {
         i++;
       }
+
       if (i >= waypoints.length - 1) {
         const last = waypoints[waypoints.length - 1];
-        setCurrentPos({
+        return {
           x: last.xPercent,
           y: last.yPercent,
           rotation: last.rotation,
           scale: last.scale,
-          opacity: last.opacity,
-          isPuffing: false,
-        });
-        return;
+          opacity: 0,
+          isVisible: false,
+        };
       }
 
-      const p0 = waypoints[i];
-      const p1 = waypoints[i + 1];
-      const t = Math.max(0, Math.min(1, (p - p0.progress) / (p1.progress - p0.progress)));
+      const wp0 = waypoints[i];
+      const wp1 = waypoints[i + 1];
+      const range = wp1.progress - wp0.progress;
+      const rawT = range > 0 ? (progress - wp0.progress) / range : 0;
+      const t = Math.max(0, Math.min(1, rawT));
 
-      // Smooth cubic easing between waypoints
+      // Luxurious smooth cubic Hermite / ease-in-out curve
       const easeT = t * t * (3 - 2 * t);
 
-      const x = p0.xPercent + (p1.xPercent - p0.xPercent) * easeT;
-      const y = p0.yPercent + (p1.yPercent - p0.yPercent) * easeT;
-      const rotation = p0.rotation + (p1.rotation - p0.rotation) * easeT;
-      const scale = p0.scale + (p1.scale - p0.scale) * easeT;
-      const opacity = p0.opacity + (p1.opacity - p0.opacity) * easeT;
+      const x = wp0.xPercent + (wp1.xPercent - wp0.xPercent) * easeT;
+      const y = wp0.yPercent + (wp1.yPercent - wp0.yPercent) * easeT;
+      const rotation = wp0.rotation + (wp1.rotation - wp0.rotation) * easeT;
+      const scale = wp0.scale + (wp1.scale - wp0.scale) * easeT;
+      const opacity = wp0.opacity + (wp1.opacity - wp0.opacity) * easeT;
 
-      setCurrentPos({
+      return {
         x,
         y,
         rotation,
         scale,
         opacity,
-        isPuffing: t > 0.1 && t < 0.9,
-      });
-    });
+        isVisible: opacity > 0.02,
+      };
+    },
+    [waypoints]
+  );
 
-    return () => unsubscribe();
-  }, [smoothProgress, waypoints]);
+  // Precise Section Tracking: Explosive Pigments & Kit (#bridal-makeup) -> Bridal Runway (#runway)
+  useEffect(() => {
+    let animFrame: number;
+    let targetProgress = -1;
+    let currentFilteredProgress = -1;
 
-  // Trail canvas for real-time cosmetic dust trail emitted from brush tip
+    const updateBoundsAndScroll = () => {
+      const startEl = document.getElementById('bridal-makeup');
+      const endEl = document.getElementById('runway');
+
+      if (!startEl || !endEl) {
+        return;
+      }
+
+      const windowH = window.innerHeight;
+      const scrollY = window.scrollY;
+
+      // Start position: when top of Explosive Pigments & Kit enters lower third of screen
+      const startRect = startEl.getBoundingClientRect();
+      const startAbsoluteTop = scrollY + startRect.top;
+      const startTrigger = startAbsoluteTop - windowH * 0.45;
+
+      // End position: when bottom of Bridal Runway exits past upper third of screen
+      const endRect = endEl.getBoundingClientRect();
+      const endAbsoluteBottom = scrollY + endRect.bottom;
+      const endTrigger = endAbsoluteBottom - windowH * 0.25;
+
+      const journeyDistance = endTrigger - startTrigger;
+
+      if (journeyDistance <= 0) return;
+
+      if (scrollY < startTrigger) {
+        // Above Explosive Pigments (e.g. Hero section) -> Brush is completely off/hidden
+        targetProgress = -0.05;
+      } else if (scrollY > endTrigger) {
+        // Below Bridal Runway (e.g. Packages, About, Contact) -> Brush has exited
+        targetProgress = 1.05;
+      } else {
+        // Actively within the journey from Explosive Pigments to Bridal Runway
+        targetProgress = (scrollY - startTrigger) / journeyDistance;
+        targetProgress = Math.max(0, Math.min(1, targetProgress));
+      }
+
+      // Track scroll velocity for kinetic rotation & powder physics
+      const now = Date.now();
+      const dt = Math.max(16, now - lastScrollTime.current);
+      const dy = Math.abs(scrollY - lastScrollY.current);
+      const instantVelocity = dy / dt;
+
+      velocityRef.current = velocityRef.current * 0.8 + instantVelocity * 0.2;
+      setScrollVelocity(velocityRef.current);
+
+      if (instantVelocity > 0.02) {
+        isMovingRef.current = true;
+        if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
+        idleTimerRef.current = setTimeout(() => {
+          isMovingRef.current = false;
+        }, 120);
+      }
+
+      lastScrollY.current = scrollY;
+      lastScrollTime.current = now;
+    };
+
+    // Smooth animation loop with spring-like progressive smoothing (butter-smooth 60/120fps)
+    const animate = () => {
+      if (currentFilteredProgress === -1 && targetProgress !== -1) {
+        currentFilteredProgress = targetProgress;
+      } else {
+        // High-fidelity progressive ease towards target
+        currentFilteredProgress += (targetProgress - currentFilteredProgress) * 0.12;
+      }
+
+      if (Math.abs(currentFilteredProgress - targetProgress) > 0.0001 || Math.abs(velocityRef.current) > 0.01) {
+        setJourneyProgress(currentFilteredProgress);
+        const nextPos = interpolatePosition(currentFilteredProgress);
+        setBrushState(nextPos);
+      }
+
+      animFrame = requestAnimationFrame(animate);
+    };
+
+    updateBoundsAndScroll();
+    window.addEventListener('scroll', updateBoundsAndScroll, { passive: true });
+    window.addEventListener('resize', updateBoundsAndScroll, { passive: true });
+    animFrame = requestAnimationFrame(animate);
+
+    return () => {
+      window.removeEventListener('scroll', updateBoundsAndScroll);
+      window.removeEventListener('resize', updateBoundsAndScroll);
+      cancelAnimationFrame(animFrame);
+      if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
+    };
+  }, [interpolatePosition]);
+
+  // Canvas Powder & Stardust Trail Emission
   useEffect(() => {
     const canvas = trailCanvasRef.current;
     if (!canvas) return;
@@ -144,7 +238,7 @@ export const TravelingMakeupBrush: React.FC = () => {
     };
     window.addEventListener('resize', handleResize);
 
-    interface TrailDust {
+    interface Stardust {
       x: number;
       y: number;
       vx: number;
@@ -153,61 +247,96 @@ export const TravelingMakeupBrush: React.FC = () => {
       alpha: number;
       color: string;
       life: number;
+      decay: number;
+      sparkle: boolean;
     }
 
-    const trailParticles: TrailDust[] = [];
+    const stardustArray: Stardust[] = [];
 
-    const trailColors = [
-      'rgba(240, 215, 160, ', // Gold shimmer
-      'rgba(245, 230, 220, ', // Champagne ivory
-      'rgba(230, 190, 185, ', // Rose blush
+    // Luxury palette: Royal gold, bridal rose, champagne shimmer, violet bristle hue
+    const palette = [
+      'rgba(197, 160, 89, ',  // Champagne gold
+      'rgba(218, 165, 32, ',  // Royal golden amber
+      'rgba(235, 120, 165, ', // Bridal rose blush
+      'rgba(178, 102, 255, ', // Velvet violet bristle glow
+      'rgba(255, 235, 200, ', // Ivory pearl glimmer
     ];
+
+    let lastTipX = 0;
+    let lastTipY = 0;
 
     const renderTrail = () => {
       ctx.clearRect(0, 0, width, height);
 
-      // Emit particles if moving
-      if (scrollVelocity > 0.05 && currentPos.opacity > 0.1) {
-        const tipX = (currentPos.x / 100) * width;
-        const tipY = (currentPos.y / 100) * height;
+      // Only emit when brush is visible on screen and within active journey
+      if (brushState.isVisible && brushState.opacity > 0.15) {
+        // Calculate the physical bristle tip in viewport coordinates
+        // Bristles are located at the upper end of the tilted brush
+        const rad = ((brushState.rotation - 90) * Math.PI) / 180;
+        const brushLength = 80 * brushState.scale;
+        const centerX = (brushState.x / 100) * width;
+        const centerY = (brushState.y / 100) * height;
 
-        // Emit 2-4 micro-dust particles from bristle tip
-        const emitCount = Math.min(5, Math.ceil(scrollVelocity * 4));
-        for (let k = 0; k < emitCount; k++) {
-          const colorBase = trailColors[Math.floor(Math.random() * trailColors.length)];
-          trailParticles.push({
-            x: tipX + (Math.random() - 0.5) * 16,
-            y: tipY + (Math.random() - 0.5) * 16,
-            vx: (Math.random() - 0.5) * 1.5,
-            vy: Math.random() * 1.2 + 0.2,
-            size: Math.random() * 3 + 1,
-            alpha: 0.75,
-            color: colorBase,
-            life: 1.0,
-          });
+        const tipX = centerX + Math.cos(rad) * brushLength * 0.45;
+        const tipY = centerY + Math.sin(rad) * brushLength * 0.45;
+
+        // Calculate motion delta
+        const dx = tipX - lastTipX;
+        const dy = tipY - lastTipY;
+        const speed = Math.sqrt(dx * dx + dy * dy);
+
+        // Emit dynamic stardust when moving or during scroll
+        if (speed > 1.2 || scrollVelocity > 0.05) {
+          const spawnCount = Math.min(6, Math.max(1, Math.floor(speed * 0.35 + scrollVelocity * 3)));
+          for (let k = 0; k < spawnCount; k++) {
+            const baseColor = palette[Math.floor(Math.random() * palette.length)];
+            const angleSpread = (Math.random() - 0.5) * Math.PI * 0.6;
+            const particleSpeed = Math.random() * 2.2 + 0.4;
+
+            stardustArray.push({
+              x: tipX + (Math.random() - 0.5) * 18,
+              y: tipY + (Math.random() - 0.5) * 18,
+              vx: Math.cos(rad + Math.PI + angleSpread) * particleSpeed + (Math.random() - 0.5),
+              vy: Math.sin(rad + Math.PI + angleSpread) * particleSpeed + Math.random() * 0.8 + 0.2,
+              size: Math.random() * 3.2 + 1.2,
+              alpha: 0.85,
+              color: baseColor,
+              life: 1.0,
+              decay: Math.random() * 0.025 + 0.015,
+              sparkle: Math.random() > 0.4,
+            });
+          }
         }
+
+        lastTipX = tipX;
+        lastTipY = tipY;
       }
 
-      // Update and render trail
-      for (let i = trailParticles.length - 1; i >= 0; i--) {
-        const p = trailParticles[i];
+      // Update and draw existing stardust particles
+      for (let i = stardustArray.length - 1; i >= 0; i--) {
+        const p = stardustArray[i];
         p.x += p.vx;
         p.y += p.vy;
-        p.life -= 0.025;
-        p.alpha = Math.max(0, p.life * 0.7);
+        p.vx *= 0.96; // Air resistance
+        p.vy += 0.02; // Gentle gravity
+        p.life -= p.decay;
+        p.alpha = Math.max(0, p.life * 0.85);
 
         if (p.life <= 0) {
-          trailParticles.splice(i, 1);
+          stardustArray.splice(i, 1);
           continue;
         }
 
-        const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size * 2);
+        // Draw glowing particle
+        const radius = p.sparkle ? p.size * (0.8 + Math.sin(Date.now() * 0.01 + i) * 0.3) : p.size;
+        const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, radius * 2.2);
         grad.addColorStop(0, `${p.color}${p.alpha})`);
+        grad.addColorStop(0.6, `${p.color}${p.alpha * 0.4})`);
         grad.addColorStop(1, `${p.color}0)`);
 
         ctx.fillStyle = grad;
         ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size * 2, 0, Math.PI * 2);
+        ctx.arc(p.x, p.y, radius * 2.2, 0, Math.PI * 2);
         ctx.fill();
       }
 
@@ -219,203 +348,77 @@ export const TravelingMakeupBrush: React.FC = () => {
       window.removeEventListener('resize', handleResize);
       cancelAnimationFrame(animId);
     };
-  }, [scrollVelocity, currentPos]);
+  }, [brushState, scrollVelocity]);
+
+  // Gentle breathing idle float offset when paused
+  const [idleFloat, setIdleFloat] = useState(0);
+  useEffect(() => {
+    let anim: number;
+    let t = 0;
+    const loop = () => {
+      t += 0.035;
+      setIdleFloat(Math.sin(t) * 4);
+      anim = requestAnimationFrame(loop);
+    };
+    anim = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(anim);
+  }, []);
+
+  // Determine visibility strictly: hidden when not in Explosive Pigments & Kit or Bridal Runway
+  const isVisible = brushState.isVisible && brushState.opacity > 0.01;
+
+  // Responsive scaling check for mobile screens
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+  const responsiveScale = (isMobile ? 0.78 : 1.05) * brushState.scale;
+
+  // Calculate dynamic rotation with motion tilt
+  const dynamicTilt = brushState.rotation + (scrollVelocity > 0.1 ? (brushState.rotation > 0 ? 4 : -4) : 0);
 
   return (
     <>
-      {/* Canvas for cosmetic dust trail */}
+      {/* 1. Hardware-Accelerated Cosmetic Dust Canvas Trail */}
       <canvas
         ref={trailCanvasRef}
+        aria-hidden="true"
         className="pointer-events-none fixed inset-0 z-35 h-full w-full"
       />
 
-      {/* Realistic 3D Physical Makeup Brush */}
+      {/* 2. Haute Couture Physical Traveling Makeup Brush */}
       <div
-        className="pointer-events-none fixed z-40 transition-opacity duration-300"
+        ref={brushContainerRef}
+        aria-hidden="true"
+        className="pointer-events-none fixed z-40 select-none will-change-transform"
         style={{
-          left: `${currentPos.x}%`,
-          top: `${currentPos.y}%`,
-          opacity: currentPos.opacity,
-          display: currentPos.opacity <= 0.01 ? 'none' : 'block',
-          transform: `translate(-50%, -50%) rotate(${currentPos.rotation}deg) scale(${currentPos.scale})`,
-          filter: `drop-shadow(0 ${15 + scrollVelocity * 8}px ${25 + scrollVelocity * 10}px rgba(0, 0, 0, 0.65))`,
-          willChange: 'transform, left, top',
+          left: `${brushState.x}%`,
+          top: `calc(${brushState.y}% + ${idleFloat}px)`,
+          opacity: brushState.opacity,
+          visibility: isVisible ? 'visible' : 'hidden',
+          display: isVisible ? 'block' : 'none',
+          transform: `translate(-50%, -50%) rotate(${dynamicTilt}deg) scale(${responsiveScale})`,
+          transition: 'opacity 0.25s ease-out',
+          filter: `drop-shadow(0 ${16 + scrollVelocity * 8}px ${28 + scrollVelocity * 10}px rgba(15, 27, 43, 0.38))`,
         }}
       >
-        <div className="relative flex flex-col items-center select-none">
-          {/* Bristle Tip Soft Powder Aura / Glow */}
+        <div className="relative flex flex-col items-center">
+          {/* Bristle Tip Soft Violet & Champagne Aura Glow */}
           <div
-            className={`absolute -top-6 h-24 w-24 rounded-full transition-all duration-300 pointer-events-none ${
-              scrollVelocity > 0.1 ? 'opacity-80 scale-125' : 'opacity-35 scale-100'
+            className={`absolute -top-6 h-32 w-32 rounded-full transition-all duration-300 pointer-events-none ${
+              scrollVelocity > 0.1 ? 'opacity-90 scale-125' : 'opacity-50 scale-100'
             }`}
             style={{
               background:
-                'radial-gradient(circle, rgba(223, 190, 133, 0.45) 0%, rgba(212, 175, 55, 0.15) 45%, transparent 70%)',
-              filter: 'blur(10px)',
+                'radial-gradient(circle, rgba(178, 102, 255, 0.45) 0%, rgba(197, 160, 89, 0.35) 45%, rgba(235, 120, 165, 0.2) 65%, transparent 80%)',
+              filter: 'blur(14px)',
             }}
           />
 
-          {/* Master Physical Brush SVG Graphic */}
-          <svg
-            width="130"
-            height="340"
-            viewBox="0 0 130 340"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            className="w-20 md:w-28 lg:w-32 h-auto"
-          >
-            <defs>
-              {/* Natural Goat/Silk Bristle Gradient */}
-              <linearGradient id="bristleGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stopColor="#fff8f0" />
-                <stop offset="18%" stopColor="#f3deb8" />
-                <stop offset="55%" stopColor="#b48956" />
-                <stop offset="85%" stopColor="#2b1f1a" />
-                <stop offset="100%" stopColor="#140e0b" />
-              </linearGradient>
-
-              {/* Shimmer on bristle tip */}
-              <linearGradient id="bristleHighlight" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="rgba(255,255,255,0.1)" />
-                <stop offset="35%" stopColor="rgba(255,248,235,0.7)" />
-                <stop offset="65%" stopColor="rgba(255,255,255,0.1)" />
-                <stop offset="100%" stopColor="rgba(0,0,0,0.3)" />
-              </linearGradient>
-
-              {/* Champagne Gold Brushed Metal Ferrule */}
-              <linearGradient id="goldFerrule" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#876523" />
-                <stop offset="18%" stopColor="#d4af37" />
-                <stop offset="38%" stopColor="#fff4d4" />
-                <stop offset="52%" stopColor="#dfbe85" />
-                <stop offset="78%" stopColor="#a37b2c" />
-                <stop offset="92%" stopColor="#d4af37" />
-                <stop offset="100%" stopColor="#5e4514" />
-              </linearGradient>
-
-              {/* Ebony Sculpted Wood Handle */}
-              <linearGradient id="ebonyHandle" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#080706" />
-                <stop offset="25%" stopColor="#221e1a" />
-                <stop offset="45%" stopColor="#3d3731" />
-                <stop offset="60%" stopColor="#1f1b18" />
-                <stop offset="90%" stopColor="#0d0b09" />
-                <stop offset="100%" stopColor="#050403" />
-              </linearGradient>
-
-              {/* Gold brand stamping text clip */}
-              <linearGradient id="goldStamp" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stopColor="#ffe7a3" />
-                <stop offset="100%" stopColor="#c5a059" />
-              </linearGradient>
-
-              {/* Metal Crimp Line Gradient */}
-              <linearGradient id="crimpGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#4d3a14" />
-                <stop offset="50%" stopColor="#fff8e7" />
-                <stop offset="100%" stopColor="#3b2b0d" />
-              </linearGradient>
-            </defs>
-
-            {/* 1. Bristle Dome (Hand-crafted tapered powder brush head) */}
-            <g id="bristle-head">
-              {/* Outer soft dome silhouette */}
-              <path
-                d="M65 8 C38 8 22 45 20 105 C20 120 22 135 24 145 L106 145 C108 135 110 120 110 105 C108 45 92 8 65 8 Z"
-                fill="url(#bristleGrad)"
-              />
-
-              {/* Bristle sheen overlay */}
-              <path
-                d="M65 8 C38 8 22 45 20 105 C20 120 22 135 24 145 L106 145 C108 135 110 120 110 105 C108 45 92 8 65 8 Z"
-                fill="url(#bristleHighlight)"
-                style={{ mixBlendMode: 'overlay' }}
-              />
-
-              {/* Natural fine hair texture lines */}
-              <path d="M65 9 Q63 70 62 144" stroke="#ffffff" strokeWidth="0.7" strokeOpacity="0.45" />
-              <path d="M52 14 Q51 75 48 144" stroke="#fce6c5" strokeWidth="0.6" strokeOpacity="0.4" />
-              <path d="M78 14 Q77 75 79 144" stroke="#ffffff" strokeWidth="0.6" strokeOpacity="0.35" />
-              <path d="M40 25 Q37 85 36 144" stroke="#e8c89b" strokeWidth="0.5" strokeOpacity="0.3" />
-              <path d="M90 25 Q92 85 93 144" stroke="#f7deb6" strokeWidth="0.5" strokeOpacity="0.3" />
-              <path d="M30 45 Q26 95 28 144" stroke="#2a1e17" strokeWidth="0.6" strokeOpacity="0.6" />
-              <path d="M100 45 Q104 95 102 144" stroke="#1f1510" strokeWidth="0.6" strokeOpacity="0.6" />
-
-              {/* Cosmetic powder dust clinging to tips */}
-              <ellipse cx="65" cy="22" rx="22" ry="12" fill="#dfbe85" fillOpacity="0.35" filter="blur(4px)" />
-              <circle cx="56" cy="18" r="1.8" fill="#fff9ed" fillOpacity="0.8" />
-              <circle cx="72" cy="24" r="1.5" fill="#f5ebe1" fillOpacity="0.75" />
-              <circle cx="64" cy="30" r="1.2" fill="#d4af37" fillOpacity="0.9" />
-            </g>
-
-            {/* 2. Gold Brass Ferrule (Polished cylinder with crimp indentations) */}
-            <g id="ferrule">
-              <path
-                d="M23 144 C23 144 26 148 65 148 C104 148 107 144 107 144 L104 208 C104 211 100 213 65 213 C30 213 26 211 26 208 Z"
-                fill="url(#goldFerrule)"
-              />
-
-              {/* Crimp ring detail 1 */}
-              <path
-                d="M24 162 C35 165 95 165 106 162"
-                stroke="url(#crimpGrad)"
-                strokeWidth="2.2"
-                strokeLinecap="round"
-              />
-
-              {/* Crimp ring detail 2 */}
-              <path
-                d="M25 186 C36 189 94 189 105 186"
-                stroke="url(#crimpGrad)"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-              />
-
-              {/* Metallic specular reflection streak */}
-              <rect
-                x="56"
-                y="144"
-                width="8"
-                height="65"
-                fill="#ffffff"
-                fillOpacity="0.65"
-                filter="blur(1px)"
-              />
-            </g>
-
-            {/* 3. Ergonomic Ebony Wooden Handle */}
-            <g id="handle">
-              <path
-                d="M26 207 C26 207 35 210 65 210 C95 210 104 207 104 207 L94 322 C93 328 88 334 65 334 C42 334 37 328 36 322 Z"
-                fill="url(#ebonyHandle)"
-              />
-
-              {/* Subtle handle highlight beam */}
-              <path
-                d="M60 210 L58 330"
-                stroke="#ffffff"
-                strokeWidth="3.5"
-                strokeOpacity="0.12"
-                filter="blur(1.5px)"
-              />
-
-              {/* Luxury Gold Branding Stamped on Handle */}
-              <text
-                x="65"
-                y="272"
-                textAnchor="middle"
-                fill="url(#goldStamp)"
-                fontSize="6"
-                fontFamily="Cormorant Garamond, serif"
-                fontWeight="600"
-                letterSpacing="2.5"
-                transform="rotate(90, 65, 272)"
-                opacity="0.9"
-              >
-                ÉLÉGANCE · 04
-              </text>
-            </g>
-          </svg>
+          {/* User's Exact Velvet Violet & Ebony Haute Couture Makeup Brush */}
+          <img
+            src="/assets/aistudio/cd446313-0ba0-48d5-ba47-c51f23716d7f-removebg-preview_73f42769.png"
+            alt="Haute Couture Physical Makeup Brush"
+            className="w-24 md:w-32 lg:w-36 h-auto max-h-[340px] object-contain select-none pointer-events-none drop-shadow-[0_18px_32px_rgba(15,27,43,0.35)] filter contrast-[1.08] brightness-[1.02]"
+            draggable={false}
+          />
         </div>
       </div>
     </>
